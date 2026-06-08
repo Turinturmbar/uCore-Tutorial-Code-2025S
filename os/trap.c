@@ -66,7 +66,12 @@ void usertrap()
 		switch (cause) {
 		case UserEnvCall:
 			trapframe->epc += 4;
-			syscall();
+			// 统计系统调用次数
+    struct proc *p = curr_proc();
+    if (p->trapframe->a7 < 500) {
+        p->syscall_count[p->trapframe->a7]++;
+    }
+    syscall();
 			break;
 		case StoreMisaligned:
 		case StorePageFault:

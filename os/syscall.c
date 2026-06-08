@@ -42,10 +42,35 @@ uint64 sys_gettimeofday(TimeVal *val, int _tz)
 
 extern char trap_page[];
 
+int sys_trace(uint64 trace_request, uint64 id, uint64 data)
+{
+    struct proc *p = curr_proc();
+    
+    switch (trace_request) {
+        case 0: {
+            uint8 *addr = (uint8 *)id;
+            return (int)(*addr);
+        }
+        case 1: {
+            uint8 *addr = (uint8 *)id;
+            *addr = (uint8)(data & 0xff);
+            return 0;
+        }
+        case 2: {
+            if (id < 500) {
+                return (int)p->syscall_count[id];
+            }
+            return -1;
+        }
+        default:
+            return -1;
+    }
+}
+
 void syscall()
 {
 	struct trapframe *trapframe = curr_proc()->trapframe;
-	int id = trapframe->a7, ret;
+	int id = trapframe->a7, ret=0;
 	uint64 args[6] = { trapframe->a0, trapframe->a1, trapframe->a2,
 			   trapframe->a3, trapframe->a4, trapframe->a5 };
 	tracef("syscall %d args = [%x, %x, %x, %x, %x, %x]", id, args[0],
@@ -66,6 +91,13 @@ void syscall()
 	case SYS_gettimeofday:
 		ret = sys_gettimeofday((TimeVal *)args[0], args[1]);
 		break;
+	case SYS_trace:
+        	trapframe->a0 = sys_trace(trapframe->a0, trapframe->a1, trapframe->a2);
+        	break;
+	case SYS_getpid:
+	        ret = curr_proc()->pid;
+	        break;
+
 	/*
 	* LAB1: you may need to add SYS_trace case here
 	*/

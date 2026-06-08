@@ -34,7 +34,8 @@ struct proc {
 	uint64 ustack; // Virtual address of user stack
 	uint64 kstack; // Virtual address of kernel stack
 	struct trapframe *trapframe; // data page for trampoline.S
-	struct context context; // swtch() here to run process
+	struct context context;
+	uint64 syscall_count[500]; // swtch() here to run process
 	/*
 	* LAB1: you may need to add some new fields here
 	*/

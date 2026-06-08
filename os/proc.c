@@ -63,6 +63,7 @@ found:
 	p->pid = allocpid();
 	p->state = USED;
 	memset(&p->context, 0, sizeof(p->context));
+	memset(p->syscall_count, 0, sizeof(p->syscall_count));
 	memset(p->trapframe, 0, PAGE_SIZE);
 	memset((void *)p->kstack, 0, PAGE_SIZE);
 	p->context.ra = (uint64)usertrapret;
