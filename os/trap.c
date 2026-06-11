@@ -45,18 +45,6 @@ void usertrap()
 {
 	set_kerneltrap();
 	struct trapframe *trapframe = curr_proc()->trapframe;
-		// 诊断：每次进入都打印
-	{
-		struct proc *me = curr_proc();
-		static int count = 0;
-		count++;
-		if (count <= 5) {
-			printf("usertrap #%d: curr_proc=%p, syscall_count[169]=%d\n",
-			       count, me, (int)me->syscall_count[169]);
-		}
-	}
-
-
 	if ((r_sstatus() & SSTATUS_SPP) != 0)
 		panic("usertrap: not from user mode");
 
