@@ -34,9 +34,13 @@ void proc_init(void)
 		/*
 		* LAB1: you may need to initialize your new fields of proc here
 		*/
+	for (int k = 0; k < 500; k++) {
+            p->syscall_count[k] = 0;
+        }
 	}
 	idle.kstack = (uint64)boot_stack_top;
 	idle.pid = 0;
+	memset(idle.syscall_count, 0, sizeof(idle.syscall_count));  // ← 新增
 	current_proc = &idle;
 }
 
@@ -63,7 +67,9 @@ found:
 	p->pid = allocpid();
 	p->state = USED;
 	memset(&p->context, 0, sizeof(p->context));
-	memset(p->syscall_count, 0, sizeof(p->syscall_count));
+	for (int k = 0; k < 500; k++) {
+    p->syscall_count[k] = 0;
+}
 	memset(p->trapframe, 0, PAGE_SIZE);
 	memset((void *)p->kstack, 0, PAGE_SIZE);
 	p->context.ra = (uint64)usertrapret;

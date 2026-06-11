@@ -45,6 +45,17 @@ void usertrap()
 {
 	set_kerneltrap();
 	struct trapframe *trapframe = curr_proc()->trapframe;
+		// 诊断：每次进入都打印
+	{
+		struct proc *me = curr_proc();
+		static int count = 0;
+		count++;
+		if (count <= 5) {
+			printf("usertrap #%d: curr_proc=%p, syscall_count[169]=%d\n",
+			       count, me, (int)me->syscall_count[169]);
+		}
+	}
+
 
 	if ((r_sstatus() & SSTATUS_SPP) != 0)
 		panic("usertrap: not from user mode");
@@ -65,14 +76,16 @@ void usertrap()
 	} else {
 		switch (cause) {
 		case UserEnvCall:
-			trapframe->epc += 4;
-			// 统计系统调用次数
-    struct proc *p = curr_proc();
-    if (p->trapframe->a7 < 500) {
-        p->syscall_count[p->trapframe->a7]++;
-    }
-    syscall();
-			break;
+		trapframe->epc += 4;
+		{
+			struct proc *p = curr_proc();
+			int sysno = p->trapframe->a7;
+			if (sysno < 500) {
+				p->syscall_count[sysno]++;
+			}
+		}
+		syscall();
+		break;
 		case StoreMisaligned:
 		case StorePageFault:
 		case InstructionMisaligned:

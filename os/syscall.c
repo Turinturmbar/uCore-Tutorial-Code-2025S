@@ -62,6 +62,7 @@ int sys_trace(uint64 trace_request, uint64 id, uint64 data)
             }
             return -1;
         }
+
         default:
             return -1;
     }
@@ -92,7 +93,7 @@ void syscall()
 		ret = sys_gettimeofday((TimeVal *)args[0], args[1]);
 		break;
 	case SYS_trace:
-        	trapframe->a0 = sys_trace(trapframe->a0, trapframe->a1, trapframe->a2);
+        	ret = sys_trace(trapframe->a0, trapframe->a1, trapframe->a2);
         	break;
 	case SYS_getpid:
 	        ret = curr_proc()->pid;
